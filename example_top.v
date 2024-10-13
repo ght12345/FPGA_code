@@ -251,7 +251,7 @@ module example_top
 	output 	[5:0] 	led_o,			//	
 	
 	
-	////////////////////////////////////////////////////////////////
+	/*////////////////////////////////////////////////////////////////
 	//	CMOS Sensor
 	output 			cmos_sclk,
 	input 			cmos_sdat_IN,
@@ -265,7 +265,7 @@ module example_top
 	input 	[7:0] 	cmos_data,
 	input 			cmos_ctl1,
 	output 			cmos_ctl2,
-	output 			cmos_ctl3,
+	output 			cmos_ctl3,*/
 	
 	
 	////////////////////////////////////////////////////////////////
@@ -903,6 +903,22 @@ module example_top
 		.image_out_data (rr_XYCrop_frame_Gray	)			//8 bits cmos data input	
 	);
 
+// //--------------------------------------------------------------------------------------------------------------------
+// //--------------------------------------------------------------------------------------------------------------------
+// //---------------------------------------------UART-------------------------------------------------------------------
+// //--------------------------------------------------------------------------------------------------------------------
+// //--------------------------------------------------------------------------------------------------------------------
+	wire 			uart_rx_done;
+	wire	[7:0]	uart_rx_data;
+
+
+	UART_RX UART_RX1(
+			.sys_clk(clk_sys),
+			.sys_rst_n(rstn_sys),
+			.uart_rxd(uart_rx_i),
+			.uart_rx_done(uart_rx_done),
+			.uart_rx_data(uart_rx_data)
+	);
 
 	
 // //--------------------------------------------------------------------------------------------------------------------
@@ -916,21 +932,21 @@ module example_top
 
 	bilinear_interpolation #(
 		.C_SRC_IMG_WIDTH  ( 640 ),
-		.C_SRC_IMG_HEIGHT (  480),
-		.C_DST_IMG_WIDTH  (  1280),
-		.C_DST_IMG_HEIGHT (  720),
+		.C_SRC_IMG_HEIGHT ( 480 ),
+		.C_DST_IMG_WIDTH  ( 1280 ),
+		.C_DST_IMG_HEIGHT ( 720 ),
 		.C_X_RATIO        ( 32768 ),
 		.C_Y_RATIO        ( 43691 ))
 	 u_bilinear_interpolation (
 		.clk_in1                 ( cmos_pclk ),
 		.clk_in2                 ( clk_pixel ),
-		.rst_n                   (  rstn_sys),
+		.rst_n                   ( rstn_sys ),
 		.per_img_vsync           ( rr_XYCrop_frame_vsync ),
 		.per_img_href            ( rr_XYCrop_frame_href&&rr_XYCrop_frame_de ),
-		.per_img_gray            ( rr_XYCrop_frame_Gray[7:0] ),
+		.per_img_gray            ( uart_rx_data ),
 	
-		.post_img_vsync          (  r_XYCrop_frame_vsync),
-		.post_img_href           (  r_XYCrop_frame_href),
+		.post_img_vsync          ( r_XYCrop_frame_vsync ),
+		.post_img_href           ( r_XYCrop_frame_href ),
 		.post_img_gray           ( r_XYCrop_frame_Gray[7:0] )
 	);
 	
